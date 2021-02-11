@@ -1,43 +1,97 @@
+package tsp;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 
 public class TSP {
 	
-	private static int numCities;
+	private static int n;
 	private static int [][] distances;
 	
 	public static void main(String[] args) {
 		routeTSP route = new routeTSP();
 		
 		readFile("benchmarks/a4.tsp");
-		//un read de los fichero solucion
+		Integer waitSol[] = new Integer [n];
+		int waitCost = readSolution("benchmarks/a4.sol",waitSol);
 		printMatrix();
-		
+
 		routeTSP solution = null;
 		switch("-fb") {
 		case "-fb":
-			ArrayList<Integer> candidates = new ArrayList();
-			for (int i = 0; i < numCities; i++){
+			LinkedList<Integer> candidates = new LinkedList<Integer>();
+			for (int i = 0; i < n; i++){
 				candidates.add(i);
 			}
-			solution = bruteForceTSP(route, candidates);
-			return;
+			route.setCities(candidates);
+			route.setCost(getCost(candidates));
+			solution = bruteforce(n, route);
 		}
+		System.out.println("Camino conseguida: " + solution.getCities());
+
+		System.out.println("Distancia conseguida: " + solution.getCost());
+		System.out.println("Distancia esperada: " + waitCost);
 		
-		System.out.println("Distancia conseguida: " + route.getCost());
-		//System.out.println("Distancia esperada: " + );
-		 
 		long time = System.currentTimeMillis();
 		time = System.currentTimeMillis()-time;
 		System.out.println("Tiempo: "+time);
 		
 	}
 	
+	public static Integer readSolution(String nomFich, Integer[] outCities) {
+		try {
+			Scanner ent = new Scanner(new FileReader(nomFich));
+			String line = ent.nextLine();
+			String [] list = line.split(" ");
+			String costString = list[3];
+			Integer solutionCost = Integer.parseInt(costString);
+			
+			line = ent.nextLine();
+			list = line.split(" ");
+			String [] citiesString = list[1].split("-");
+			
+			for(int i = 0; i < n; i++) {
+				outCities[i] = Integer.parseInt(citiesString[i]);
+			}
+			
+			return solutionCost;
+				
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
+	
+	public static routeTSP bruteforce(int n, routeTSP route) {
+		routeTSP bestRoad = new routeTSP();
+		double minCost = getCost(route.getCities());
+		int[] indexes = new int[n];
+		LinkedList<Integer> cities = route.getCities();
+		for (int i = 0; i < n; i++) {
+		    indexes[i] = 0;
+		}
+		int i = 0;
+		while (i < n) {
+		    if (indexes[i] < i) {
+		    	Collections.swap(cities, i % 2 == 0 ?  0: indexes[i], i);
+		        double cost = getCost(cities);
+		        if ( minCost>cost) {
+		        	minCost=cost;
+		        	bestRoad.setCities(cities);
+		        }
+		        indexes[i]++;
+		        i = 0;
+		    } else {
+		        indexes[i] = 0;
+		        i++;
+		    }
+		}
+		bestRoad.setCost(getCost(bestRoad.getCities()));
+		return bestRoad;
+	}
+	/*
 	public static routeTSP bruteForceTSP(routeTSP route, ArrayList<Integer> candidates) {
 		routeTSP retVal = null; //valor a retornar	
 		for(int i : candidates){
@@ -99,62 +153,52 @@ public class TSP {
 		}
 		return retVal;
 	}
-	
+	*/
 	public static void readFile(String nomFich){
-		getNumCities(nomFich);
 		try {
 			Scanner ent = new Scanner(new FileReader(nomFich));
-			distances=new int[numCities][numCities];
-			int i = 0;
-			while (ent.hasNext()) {
-				String line = ent.nextLine();
-					int num=0;
-					line = line.trim().replaceAll("\\s{2,}", " ");
-					String [] listNumbers = line.split(" ");
-					for (int j=0; j<listNumbers.length; j++) {
-						System.out.println(listNumbers[j]);
-						//salta excepcion aqui porque en los ficheros que nos da el hay columnas 
-						//separadas por mas de un espacio.
-						num = Integer.parseInt(listNumbers[j]); 
-		            	distances[i][j]=num;
-					}
-				i++;
-			}
-			
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public static void getNumCities(String nomFich) {
-		try {
-			Scanner ent = new Scanner(new FileReader(nomFich));
-			String line = null;
-			if(ent.hasNext()){
+			String line = "";
+			String [] listNumbers = {};
+			if(ent.hasNext()) {
 				line = ent.nextLine();
-				numCities=line.length()-line.replace(" ", "").length()+1;
+				listNumbers = line.trim().split("\\s+");
+			}
+			n=listNumbers.length;
+			
+			distances=new int[n][n];
+			int i = 0;
+			while (i<n) {
+				int num=0;
+				for (int j=0; j<listNumbers.length; j++) {
+					num = Integer.parseInt(listNumbers[j]);
+	            	distances[i][j]=num;
+				}
+				i++;
+				if(ent.hasNext()) {
+					line = ent.nextLine();
+					listNumbers = line.trim().split("\\s+");
+				}
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void printMatrix(){
-		for (int i=0; i<numCities; i++){
-			for (int j=0;j<numCities; j++){
-				System.out.print(distances[i][j]);
+		for (int i=0; i<n; i++){
+			for (int j=0;j<n; j++){
+				System.out.print(distances[i][j]+" ");
 			}
 			System.out.println();
 		}
 	}
 	
-	/*public static int getCost(int[] road) {
+	public static int getCost(LinkedList<Integer> road) {
 		int cost = 0;
-		for (int i=0; i<numCities-1; i++ ) {
-			cost += distances[road[i]][road[i+1]];
+		for (int i=0; i<n-1; i++ ) {
+			cost += distances[road.get(i)][road.get(i+1)];
 		}
-		cost += distances[road[numCities-1]][road[0]];
+		cost += distances[road.get(n-1)][road.get(0)];
 		return cost;
-	}*/
-
+	}
 }

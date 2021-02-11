@@ -1,5 +1,5 @@
+package tsp;
 import java.util.LinkedList;
-import java.util.List;
 
 public class routeTSP {
 
@@ -12,8 +12,9 @@ public class routeTSP {
 		cost = 0;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public routeTSP(routeTSP r){
-		cities = r.cities;
+		cities = (LinkedList<Integer>) r.cities.clone();
 		cost = r.cost;
 	}
 
@@ -22,8 +23,9 @@ public class routeTSP {
 		return cities;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void setCities(LinkedList<Integer> cities) {
-		this.cities = cities;
+		this.cities = cities = (LinkedList<Integer>) cities.clone();
 	}
 
 	public int getCost() {
