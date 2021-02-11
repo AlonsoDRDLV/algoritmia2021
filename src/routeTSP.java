@@ -8,7 +8,7 @@ public class routeTSP {
 	
 	//CONSTRUCTORES-------------------------------------
 	public routeTSP(){
-		cities = null;
+		cities = new LinkedList<Integer>();
 		cost = 0;
 	}
 	

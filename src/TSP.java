@@ -13,15 +13,18 @@ public class TSP {
 	
 	public static void main(String[] args) {
 		routeTSP route = new routeTSP();
-		ArrayList<Integer> candidates = null;
 		
 		readFile("benchmarks/a4.tsp");
 		//un read de los fichero solucion
 		printMatrix();
 		
 		routeTSP solution = null;
-		switch(args[1]) {
+		switch("-fb") {
 		case "-fb":
+			ArrayList<Integer> candidates = new ArrayList();
+			for (int i = 0; i < numCities; i++){
+				candidates.add(i);
+			}
 			solution = bruteForceTSP(route, candidates);
 			return;
 		}
@@ -62,13 +65,15 @@ public class TSP {
 		ArrayList<Integer> c = new ArrayList<Integer>(candidates);
 		
 		if(!c.isEmpty()) {
+			System.out.println(c.isEmpty());
+			System.out.println(c.size());
 			for(int j : c){
 				//Añadir ciudad al camino y aumentar el coste
-				r.getCities().addLast(j);
+				r.getCities().addLast(new Integer(j));
 				r.setCost(r.getCost() + distances[i][j]);
 				
 				//eliminar la ciudad añadida de la lista de posibles ciudades siguientes
-				c.remove(j);
+				c.remove(new Integer(j));
 				
 				routeTSP partialSolution = bruteForceTSPR(r, c, j);
 				
@@ -80,11 +85,16 @@ public class TSP {
 					retVal.setCost(partialSolution.getCost());
 					retVal.setCities(partialSolution.getCities());
 				}
+				if(c.isEmpty()) {
+					System.out.println("hola");
+					break;
+				}
 			}
 		}
 		else {
 			//si no quedan ciudades por visitar sumamos el coste de ir 
 			//de la ultima a la primera
+			retVal = r;
 			retVal.setCost(distances[route.getCities().getLast()][route.getCities().getFirst()]);
 		}
 		return retVal;
@@ -99,6 +109,7 @@ public class TSP {
 			while (ent.hasNext()) {
 				String line = ent.nextLine();
 					int num=0;
+					line = line.trim().replaceAll("\\s{2,}", " ");
 					String [] listNumbers = line.split(" ");
 					for (int j=0; j<listNumbers.length; j++) {
 						System.out.println(listNumbers[j]);
