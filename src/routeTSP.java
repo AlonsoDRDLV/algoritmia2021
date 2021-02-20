@@ -1,4 +1,3 @@
-package tsp;
 import java.util.LinkedList;
 
 public class routeTSP {
