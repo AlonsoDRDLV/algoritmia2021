@@ -11,13 +11,13 @@ public class TSP {
 	
 	public static void main(String[] args) {
 		
-		readFile("benchmarks/dantzig42.tsp");
-		Integer waitSol[] = new Integer [n];
+		readFile("benchmarks/"+args[1]);
+		//Integer waitSol[] = new Integer [n];
 		//int waitCost = readSolution("benchmarks/gr17.sol",waitSol);
 		printMatrix();
 
 		routeTSP solution = null;
-		switch("-av") {
+		switch(args[0]) {
 		case "-fb":			
 			solution = bruteForce();
 			break;
@@ -65,7 +65,6 @@ public class TSP {
 		routeTSP bestRoad = new routeTSP();
 		
 		//inicializar lista a permutar y calcular su coste----------
-		routeTSP route = new routeTSP();
 		LinkedList<Integer> cities = new LinkedList<Integer>();
 		for (int i = 0; i < n; i++){
 			cities.add(i);
@@ -84,7 +83,7 @@ public class TSP {
 		        double cost = getCost(cities);
 		        if ( minCost>cost) {
 		        	minCost=cost;
-		        	bestRoad.setCities(cities); //esto no hace falta no? vae con hacerlo al final
+		        	bestRoad.setCities(cities); 
 		        }
 		        indexes[i]++;
 		        i = 0;
@@ -105,9 +104,8 @@ public class TSP {
 				bestRoute = route;
 			}
 		}
+		bestRoute.setCost(getCost(bestRoute.getCities()));
 		return bestRoute;
-	
-		
 	}
 	
 	public static routeTSP greedyStartingFromI(int i) {
@@ -139,7 +137,7 @@ public class TSP {
 			}
 			cities.add(nextStep);
 			minCost += nextStepCost;
-			candidates.remove(new Integer(nextStep));
+			candidates.remove(Integer.valueOf(nextStep));
 		}
 		
 		routeTSP retVal = new routeTSP();
