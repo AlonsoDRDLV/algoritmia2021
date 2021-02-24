@@ -1,10 +1,11 @@
 #"make" para compilarlo
 #"java TSP -op fichero.tsp" para ejecutarlo
 #"make op_test" siendo op=fb|av|pd|rp para ejecutar las 
-#	pruebas con la opci√≥n correspondiente
+#	pruebas con la opciÛn correspondiente
 #"make all_test" para ejecutar las pruebas con todas las pruebas
 #"make clean" para eliminar el ejecutable y archivos objeto.
-### ahora hace la prueba solo con a4, puedes a√±adir la asignaci√≥n de FILE2 en FILE para ejecutar todas.
+### ahora hace la prueba solo con a4, puedes cambiar la asignaciÛn 
+#	de FILE2 a FILE para ejecutar todas.
 JFLAGS = -g
 JC = javac
 JVM = java
